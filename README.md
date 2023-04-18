@@ -99,9 +99,9 @@ BccUtils.Discord.sendMessage('webhookurl', 'My Script', 'https://cdn2.iconfinder
 local discord = BccUtils.Discord:setup('webhookurl', 'My Script', 'https://cdn2.iconfinder.com/data/icons/frosted-glass/256/Danger.png')
 
 -- (name, description, embeds)
-BccUtils.Discord.sendMessage('user123', 'this user is awesome')
+discord.sendMessage('user123', 'this user is awesome')
 
-BccUtils.Discord.sendMessage('user456', 'this user is ALSO awesome')
+discord.sendMessage('user456', 'this user is ALSO awesome')
 ```
 
 

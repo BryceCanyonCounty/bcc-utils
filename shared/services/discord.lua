@@ -33,7 +33,7 @@ DiscordAPI.setup = function (webhookurl, webhookname, webhookavatar)
     discord_data.webhookurl = webhookurl
 
     function discord_data:sendMessage(name, description, embeds)
-        _internalSendMessage(name, description, embeds, self.webhookurl, self.webhookname, self.webhookavatar)
+        _internalSendMessage(self.webhookurl, self.webhookname, self.webhookavatar, name, description, embeds)
     end
 
     return discord_data

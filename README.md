@@ -20,7 +20,7 @@
 - Place this atop your client file!
 ```lua
 local BccUtils = {}
-TriggerEvent('getBcc-Utils', function(bccutils)
+TriggerEvent('bcc:getUtils', function(bccutils)
     BccUtils = bccutils
 end)
 ```
@@ -96,12 +96,26 @@ BccUtils.Discord.sendMessage('webhookurl', 'My Script', 'https://cdn2.iconfinder
 
 ```lua
 -- (webhookurl, webhookname, webhookavatar)
-local discord = BccUtils.Discord:setup('webhookurl', 'My Script', 'https://cdn2.iconfinder.com/data/icons/frosted-glass/256/Danger.png')
+local discord = BccUtils.Discord.setup('webhookurl', 'My Script', 'https://cdn2.iconfinder.com/data/icons/frosted-glass/256/Danger.png')
 
 -- (name, description, embeds)
-discord.sendMessage('user123', 'this user is awesome')
+discord:sendMessage('user123', 'this user is awesome')
 
-discord.sendMessage('user456', 'this user is ALSO awesome')
+discord:sendMessage('user456', 'this user is ALSO awesome')
+
+discord:sendMessage('user789', 'this user kinda really awesome', {
+    {
+        color = 11342935,
+        title = 'Embed Item 1',
+        description = 'Items awesome description?'
+    },
+    {
+        color = 11342935,
+        title = 'Embed Item 2',
+        description = 'Item 2 awesome description!'
+    },
+})
+
 ```
 
 

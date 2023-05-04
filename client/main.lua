@@ -3,6 +3,8 @@ local function getUtils ()
 
     UtilAPI.YtAudioPlayer = YtAudioPlayer
     UtilAPI.Discord = DiscordAPI
+    UtilAPI.Ped = PedAPI
+    UtilAPI.Misc = MiscAPI
     
     return UtilAPI
 end

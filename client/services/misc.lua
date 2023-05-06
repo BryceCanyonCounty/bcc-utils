@@ -15,3 +15,12 @@ function MiscAPI.DrawText3D(x, y, z, text)
         DrawSprite("feeds", "hud_menu_4a", _x, _y+0.0125,0.015+ factor, 0.03, 0.1, 35, 35, 35, 190, 0)
     end
 end
+
+function MiscAPI.DistanceCheckEntity(x, y, z, entity, dist, usez)
+    while true do
+        Citizen.Wait(50)
+        local ce = GetEntityCoords(entity)
+        if GetDistanceBetweenCoords(x, y, z, ce.x, ce.y, ce.z, usez) < dist then return true end
+        if IsEntityDead(entity) then return false end
+    end
+end

@@ -25,6 +25,7 @@ function PedAPI.CreatePed(model, x, y, z, h, networked, scripthostped, staticped
       Wait(100)
     end
     local ped = CreatePed(model, x, y, z, h, networked, scripthostped)
+    Citizen.InvokeNative(0x283978A15512B2FE, ped, true)
     if staticped then
         PedAPI.SetStatic(ped)
     end

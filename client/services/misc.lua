@@ -24,3 +24,15 @@ function MiscAPI.DistanceCheckEntity(x, y, z, entity, dist, usez)
         if IsEntityDead(entity) then return false end
     end
 end
+
+function MiscAPI.SetGps(x, y, z)
+    local x2,y2,z2 = table.unpack(GetEntityCoords(PlayerPedId()))
+    StartGpsMultiRoute(6, true, true)
+    AddPointToGpsMultiRoute(x2, y2, z2)
+    AddPointToGpsMultiRoute(x, y, z)
+    SetGpsMultiRouteRender(true)
+end
+
+function MiscAPI.RemoveGps()
+    ClearGpsMultiRoute()
+end

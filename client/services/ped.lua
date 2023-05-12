@@ -14,3 +14,31 @@ function PedAPI.ScenarioInPlace(ped, hash, time)
     ClearPedTasksImmediately(ped)
     FreezeEntityPosition(ped, false)
 end
+
+function PedAPI.CreatePed(model, x, y, z, h, networked, scripthostped, staticped)
+    joaat(model)
+    RequestModel(model)
+    if not HasModelLoaded(model) then
+        RequestModel(model)
+    end
+    while not HasModelLoaded(model) do
+      Wait(100)
+    end
+    local ped = CreatePed(model, x, y, z, h, networked, scripthostped)
+    if staticped then
+        PedAPI.SetStatic(ped)
+    end
+    return ped
+end
+
+function PedAPI.FreezePed(ped)
+    FreezeEntityPosition(ped, true)
+end
+
+function PedAPI.UnfreezePed(ped)
+    FreezeEntityPosition(ped, false)
+end
+
+function PedAPI.SetPedHealth(ped, healthamount)
+    SetEntityHealth(ped, healthamount, 0)
+end

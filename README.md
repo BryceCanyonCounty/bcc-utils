@@ -142,6 +142,62 @@ BccUtils.Discord.sendMessage('webhookurl', 'My Script', 'https://cdn2.iconfinder
 })
 ```
 
+### Ped API
+> Create A Ped
+```lua
+-- model is the model name of the ped x, y, z are the coords to spawn at, networked ped true or false, scripthostped true or false, staticped true or false(static ped will freeze the ped in place making him not move or get scared good for shop keeper peds)
+local createdped = BccUtils.Ped.CreatePed(model, x, y, z, networked, scripthostped, staticped)
+```
+
+> Set Ped Static
+```lua
+-- This will freeze the ped in place making him not move or get scared good for shop keeper peds
+BccUtils.Ped.SetStatic(ped)
+```
+
+> Make Ped Play a scenario In Place
+```lua
+BccUtils.Ped.ScenarioInPlace(ped, scenariohash, timetoplay)
+```
+
+> Freeze Ped In Place
+```lua
+BccUtils.Ped.FreezePed(ped)
+```
+
+> Unfreeze ped
+```lua
+BccUtils.Ped.UnfreezePed(ped)
+```
+
+> Change a peds health
+```lua
+-- Health amount has to be a number
+BccUtils.Ped.SetPedHealth(ped, healthamount)
+```
+
+### Misc API
+> DrawText3D
+```lua
+BccUtils.Misc.DrawText3D(x, y, z, 'your text')
+```
+
+> Distance Check for an entity
+```lua
+-- This will detect the distance between the entity and the x,y,z coords and when you are within the set dist it will break the loop
+BccUtils.Misc.DistanceCheckEntity(x, y, z, entity, dist, usez)
+```
+
+> Set GPS Waypoin
+```lua
+--This will place a gps waypoint on the players map to the coords set
+BccUtils.Misc.SetGps(x, y, z)
+```
+
+> Remove GPS Waypoint
+```lua
+BccUtils.Misc.RemoveGps()
+```
 
 ## TODO
 - Multi-instanced yt audio player

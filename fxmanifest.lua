@@ -5,10 +5,14 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 lua54 'yes'
 
 shared_scripts {
-    'shared/services/*.lua'
+    'shared/data/*.lua',
+    'shared/helpers/*.lua',
+    'shared/services/*.lua',
+    'shared/main.lua'
 }
 
 server_scripts {
+    'server/helpers/*.lua',
     'server/services/*.lua',
     'server/main.lua'
 }

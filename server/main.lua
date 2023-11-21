@@ -3,7 +3,8 @@ local function getUtils ()
     local UtilAPI = {}
 
     UtilAPI.Versioner = VersionerAPI
-    UtilAPI.Discord = DiscordAPI
+
+    UtilAPI = SetupSharedAPI(UtilAPI)
 
     return UtilAPI
 end

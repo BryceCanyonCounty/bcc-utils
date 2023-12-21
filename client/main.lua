@@ -4,15 +4,19 @@ local function getUtils ()
     UtilAPI.YtAudioPlayer = YtAudioPlayer
     UtilAPI.Misc = MiscAPI
     UtilAPI.Blip = BlipAPI
+    UtilAPI.Blips = BlipAPI
     UtilAPI.Horse = HorseAPI
     UtilAPI.Map = MapAPI
     UtilAPI.Object = ObjectAPI
+    UtilAPI.Objects = ObjectAPI
     UtilAPI.Ped = PedAPI
     UtilAPI.Prompt = PromptsAPI
+    UtilAPI.Prompts = PromptsAPI
     UtilAPI.Render = RenderAPI
     UtilAPI.Keys = KeyPressAPI
     UtilAPI.Clip = ClipAPI
     UtilAPI.UI = UIAPI
+    UtilAPI.Destruct = DestructionAPI
 
     UtilAPI = SetupSharedAPI(UtilAPI)
 

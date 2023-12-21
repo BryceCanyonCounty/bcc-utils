@@ -30,4 +30,4 @@ files {
 
 ui_page 'ui/index.html'
 
-version '1.0.5'
+version '1.0.6'

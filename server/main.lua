@@ -9,7 +9,6 @@ local function getUtils ()
     return UtilAPI
 end
 
-
 AddEventHandler('bcc:getUtils', function(cb)
     cb(getUtils())
 end)
@@ -17,7 +16,6 @@ end)
 exports('initiate',function()
     return getUtils()
 end)
-
 
 VersionerAPI.checkRelease(GetCurrentResourceName(), 'https://github.com/BryceCanyonCounty/bcc-utils')
 

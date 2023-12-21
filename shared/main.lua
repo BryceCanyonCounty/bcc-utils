@@ -5,6 +5,7 @@ function SetupSharedAPI(SharedApi)
     SharedApi.Keys = Keys
     SharedApi.Math = MathAPI
     SharedApi.Discord = DiscordAPI
+    SharedApi.General = GeneralAPI
 
     return SharedApi
 end

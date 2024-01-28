@@ -5,6 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 lua54 'yes'
 
 shared_scripts {
+    'config.lua',
     'shared/data/*.lua',
     'shared/helpers/*.lua',
     'shared/services/*.lua',
@@ -30,4 +31,4 @@ files {
 
 ui_page 'ui/index.html'
 
-version '1.0.6'
+version '1.0.7'

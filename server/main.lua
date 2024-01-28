@@ -17,5 +17,5 @@ exports('initiate',function()
     return getUtils()
 end)
 
-VersionerAPI.checkRelease(GetCurrentResourceName(), 'https://github.com/BryceCanyonCounty/bcc-utils')
+VersionerAPI.checkFile(GetCurrentResourceName(), 'https://github.com/BryceCanyonCounty/bcc-utils')
 

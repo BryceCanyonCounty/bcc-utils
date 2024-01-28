@@ -106,6 +106,16 @@ function VersionerAPI.checkFile(resourcename, repo)
     }
     PerformHttpRequest('https://raw.githubusercontent.com/' .. cleanrepo .. '/main/version',
         function(err, response, headers)
+            if err == 404 then
+                print("Version file not found")
+                return
+            end
+            
+            if response == nil then
+                print("Generic github version error", err)
+                return
+            end
+
             local v = response:match("<%d?%d.%d?%d.?%d?%d?>"):gsub("[<>]", "")
             local latest = {
                 url = repo,

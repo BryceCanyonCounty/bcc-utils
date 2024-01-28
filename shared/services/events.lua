@@ -78,7 +78,7 @@ local function startGlobalEventListeners(eventgroup)
 	end)
 end
 
-function StartGlobalEventListeners()
+function StartAllEventListeners()
 	startGlobalEventListeners(0) -- 0 = Client Side Events
 	startGlobalEventListeners(1) -- 1 = Network Events
 end
@@ -100,7 +100,10 @@ function EventsAPI:RegisterEventListener(eventname, cb)
 	}
     EventListenerCount = EventListenerCount + 1
 
-	print("EventListener Registered", eventname);
+	if Config.DevMode then
+		print("EventListener Registered", eventname);
+	end
+	
 	return { key, postition }
 end
 
@@ -126,3 +129,5 @@ function EventsAPI:DevMode(state, type)
 		EventsDevMode[1] = state
 	end
 end
+
+StartAllEventListeners()

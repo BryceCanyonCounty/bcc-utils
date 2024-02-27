@@ -1,13 +1,18 @@
 BlipAPI = {}
 
-function BlipAPI:SetBlip(name, sprite, scale, x, y, z)
+function BlipAPI:SetBlip(name, sprite, scale, x, y, z, blipVector)
     local BlipClass = {}
 
-    BlipClass.rawblip =  Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, vector3(x, y, z))
-    BlipClass.x = x
-    BlipClass.y = y
-    BlipClass.z = z
-    
+    if not blipVector then
+        BlipClass.rawblip =  Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, vector3(x, y, z))
+        BlipClass.x = x
+        BlipClass.y = y
+        BlipClass.z = z
+    else
+        BlipClass.rawblip =  Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, blipVector)
+        BlipClass.vector3 = blipVector
+    end
+
     if type(sprite) == "string" then
         sprite = joaat(sprite)
     end

@@ -32,6 +32,23 @@ function BlipAPI:SetBlip(name, sprite, scale, x, y, z, blipVector)
     return BlipClass
 end
 
+function BlipAPI:AddBlipModifier(blip, modifier)
+    local ModifierClass = {}
+
+    function ModifierClass:ApplyModifier()
+        if blip and modifier then
+            -- Ensure the modifier is in the correct format
+            if type(modifier) == "string" then
+                modifier = joaat(modifier)
+            end
+            -- Add the modifier to the blip
+            Citizen.InvokeNative(0x662D364ABF16DE2F, blip:Get(), modifier)
+        end
+    end
+
+    return ModifierClass
+end
+
 function BlipAPI:SetRadius(hash, radius, x, y, z)
     local RadiusClass = {}
 

@@ -6,6 +6,7 @@ function SetupSharedAPI(SharedApi)
     SharedApi.Math = MathAPI
     SharedApi.Discord = DiscordAPI
     SharedApi.General = GeneralAPI
-
+    SharedApi.RPC = RPC
+	
     return SharedApi
 end

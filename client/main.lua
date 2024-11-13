@@ -17,7 +17,8 @@ local function getUtils ()
     UtilAPI.Clip = ClipAPI
     UtilAPI.UI = UIAPI
     UtilAPI.Destruct = DestructionAPI
-
+    UtilAPI.RPC = RPC
+	
     UtilAPI = SetupSharedAPI(UtilAPI)
 
     return UtilAPI

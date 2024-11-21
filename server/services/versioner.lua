@@ -60,16 +60,16 @@ local function _interalCall(resourcename, repo, cached)
 
             if uptodate then
                 alerts = {
-                    '^2✅Up to Date! ^5[' .. resourcename .. '] ^6(Current Version ' .. current.version .. ')^0'
+                    '^2✅ Up to Date! ^5[' .. resourcename .. '] ^6(Current Version ' .. current.version .. ')^0'
                 }
             elseif overdate then
                 alerts = {
-                    '^3⚠️Unsupported! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0',
+                    '^3⚠️ Unsupported! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0',
                     '^4Current Version ^2(' .. latest.version .. ') ^3<' .. latest.url .. '>^0'
                 }
             else
                 alerts = {
-                    '^1❌Outdated! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0',
+                    '^1❌ Outdated! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0',
                     '^4NEW VERSION ^2(' .. latest.version .. ') ^3<' .. latest.url .. '>^0',
                     '^4CHANGELOG ^0\r\n' .. latest.body
                 }
@@ -134,12 +134,12 @@ function VersionerAPI.checkFile(resourcename, repo)
             end
 
             if uptodate then
-                print('^2✅Up to Date! ^5[' .. resourcename .. '] ^6(Current Version ' .. current.version .. ')^0')
+                print('^2✅ Up to Date! ^5[' .. resourcename .. '] ^6(Current Version ' .. current.version .. ')^0')
             elseif overdate then
-                print('^3⚠️Unsupported! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0')
+                print('^3⚠️ Unsupported! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0')
                 print('^4Current Version ^2(' .. latest.version .. ') ^3<' .. latest.url .. '>^0')
             else
-                print('^1❌Outdated! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0')
+                print('^1❌ Outdated! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0')
                 print('^4NEW VERSION ^2(' .. latest.version .. ') ^3<' .. latest.url .. '>^0')
 
                 local cl = latest.body:gsub("<" .. current.version .. ">.*", "")

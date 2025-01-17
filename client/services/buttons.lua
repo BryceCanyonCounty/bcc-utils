@@ -3,13 +3,14 @@ ButtonAPI = {}
 ---Creates a button handler class.
 ---@param control integer EXAMPLE VALUE: 0
 ---@param button string | integer Hash or string to be hashed EXAMPLE VALUE: `INPUT_JUMP`
+---@param checkDisabled boolean Check even if the button is disabled
 ---@param doublePressThreshold integer Treshhold for double and more press detection EXAMPLE VALUE: 300
 ---@param holdPressThreshold integer Treshhold for long press detection EXAMPLE VALUE: 1000
 ---@param Callbacks { OnRepeatedJustPressed?: function, OnRepeatedJustReleased?: function, OnHold?: function, OnLongPressDetection?: function, OnTotalRepeatedPress?: function }
 ---@param autoUpdate? boolean automaticaly star update cycle
 ---@param alternative? boolean whitch mode use for auto update
 ---@return ButtonClass
-function ButtonAPI:Create(control, button, doublePressThreshold, holdPressThreshold, Callbacks, autoUpdate, alternative)
+function ButtonAPI:Create(control, button, checkDisabled, doublePressThreshold, holdPressThreshold, Callbacks, autoUpdate, alternative)
     ---@class ButtonClass
     local ButtonClass = {}
 
@@ -21,6 +22,7 @@ function ButtonAPI:Create(control, button, doublePressThreshold, holdPressThresh
 
     ButtonClass.control = control
     ButtonClass.button = button
+    ButtonClass.checkDisabled = checkDisabled
     ButtonClass.repeatedPressThreshold = doublePressThreshold
     ButtonClass.holdPressThreshold = holdPressThreshold
     ButtonClass.CallbackOnRepeatedJustPressed =  Callbacks.OnRepeatedJustPressed or function(timesPressed) Debug(string.format("Repeated press number %d", timesPressed)) end
@@ -37,7 +39,11 @@ function ButtonAPI:Create(control, button, doublePressThreshold, holdPressThresh
     function ButtonClass:Update(alternative)
         local current = GetGameTimer()
 
-        if IsControlJustPressed(self.control, self.button) then
+        local IsJustPressed =  self.checkDisabled and IsDisabledControlJustPressed  or IsControlJustPressed
+        local IsPressed =      self.checkDisabled and IsDisabledControlPressed      or IsControlPressed
+        local IsJustReleased = self.checkDisabled and IsDisabledControlJustReleased or IsControlJustReleased
+
+        if IsJustPressed(self.control, self.button) then
             if ((current - lastPressTime) < self.repeatedPressThreshold) then
                 pressCount = pressCount + 1 -- Repeated pressing
             else
@@ -45,13 +51,13 @@ function ButtonAPI:Create(control, button, doublePressThreshold, holdPressThresh
             end
             self.CallbackOnRepeatedJustPressed(pressCount) -- Do something
             lastPressTime = current
-        elseif IsControlPressed(self.control, self.button) then
+        elseif IsPressed(self.control, self.button) then
             if ((current - lastPressTime) > self.holdPressThreshold) then
                 self.CallbackOnLongPressDetection(pressCount) -- Do something
                 pressCount = 0 -- needed for omit CallbackOnTotalRepeatedPress (fire only ONE callback among these: CallbackOnLongPressDetection, CallbackOnTotalRepeatedPress)
             end
             self.CallbackOnHold(pressCount) -- Do something
-        elseif IsControlJustReleased(self.control, self.button) then
+        elseif IsJustReleased(self.control, self.button) then
             if alternative then -- Alternative
                 if ((current - lastReleaseTime) < self.repeatedPressThreshold) then
                     self.CallbackOnRepeatedJustReleased(pressCount) -- Do something
@@ -70,6 +76,18 @@ function ButtonAPI:Create(control, button, doublePressThreshold, holdPressThresh
                 pressCount = 0 -- reset clicking counter
             end
         end
+    end
+
+    ---Sets the mode to check only enabled or enabled and disabled buttons
+    ---@param checkDisabled boolean true - check even if the button is disabled, false - only check if button is enabled
+    function ButtonClass:SetCheckDisabled(checkDisabled)
+        self.checkDisabled = checkDisabled
+    end
+
+    ---Returns the mode of checking only enabled or enabled and disabled buttons
+    ---@return boolean # Returns whether the mode is set to check for disabled buttons
+    function ButtonClass:GetCheckDisabled()
+        return self.checkDisabled
     end
 
     ---Stop auto update process
@@ -110,7 +128,7 @@ end
 local longPressThreshold = 1000
 local repeatPressThreshold = 300
 local button = `INPUT_DUCK` -- same as 0xDB096B85
-local CtrlButton = ButtonAPI:Create(0, button, repeatPressThreshold, longPressThreshold, {
+local CtrlButton = ButtonAPI:Create(0, button, true, repeatPressThreshold, longPressThreshold, {
     OnRepeatedJustPressed = function(count) end,
     OnRepeatedJustReleased = function(count) end,
     OnHold = function() end, -- calls every tick when button is pressed
@@ -119,7 +137,7 @@ local CtrlButton = ButtonAPI:Create(0, button, repeatPressThreshold, longPressTh
             -- Do stuff after holding the button down long enough
         elseif count == 2 then
             -- Do stuff after double-clicking the button and then holding it down
-        ifelse count == 3 then
+        elseif count == 3 then
             -- Do stuff after triple-clicking the button and then holding it down
         end
     end,

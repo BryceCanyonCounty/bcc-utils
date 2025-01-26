@@ -18,6 +18,7 @@ local function getUtils ()
     UtilAPI.UI = UIAPI
     UtilAPI.Destruct = DestructionAPI
     UtilAPI.RPC = RPC
+    UtilAPI.Button = ButtonAPI
 	
     UtilAPI = SetupSharedAPI(UtilAPI)
 

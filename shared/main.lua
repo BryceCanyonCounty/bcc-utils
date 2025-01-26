@@ -7,6 +7,7 @@ function SetupSharedAPI(SharedApi)
     SharedApi.Discord = DiscordAPI
     SharedApi.General = GeneralAPI
     SharedApi.RPC = RPC
-	
+    SharedApi.Command = CommandAPI
+    SharedApi.Helpers = HelpersAPI
     return SharedApi
 end

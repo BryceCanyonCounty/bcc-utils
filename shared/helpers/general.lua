@@ -24,3 +24,9 @@ function CheckVar(val, def)
 
     return val
 end
+
+HelpersAPI = {
+    StringChain = StringChain,
+    IsOnServer = IsOnServer,
+    CheckVar = CheckVar
+}

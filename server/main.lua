@@ -3,9 +3,11 @@ local function getUtils ()
     local UtilAPI = {}
 
     UtilAPI.Versioner = VersionerAPI
-
+    UtilAPI.Database = DatabaseAPI
+    UtilAPI.file = FilesAPI
     UtilAPI = SetupSharedAPI(UtilAPI)
 
+    UtilAPI.instance = InstanceAPI
     return UtilAPI
 end
 

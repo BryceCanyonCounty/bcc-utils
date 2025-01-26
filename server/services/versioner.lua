@@ -151,3 +151,47 @@ function VersionerAPI.checkFile(resourcename, repo)
 end
 
 _loadActiveCache()
+
+local function CheckForUpdate(resource)
+    local ActiveCheck = GetResourceMetadata(resource, 'github_version_check', 0)
+
+    if ActiveCheck == 'true' then
+        local resourcename = GetResourceMetadata(resource, 'name', 0)
+        local github = GetResourceMetadata(resource, 'github_link', 0)
+        local githubtype = GetResourceMetadata(resource, 'github_version_type', 0)
+        if not githubtype then
+            githubtype = "release"
+        end
+
+        if githubtype == "release" then
+            VersionerAPI.checkRelease(resourcename, github)
+        elseif githubtype == "file" then
+            VersionerAPI.checkFile(resourcename, github)
+        end
+    end
+end
+
+local function CheckForUIRelease(resource)
+    local CheckUI = GetResourceMetadata(resource, 'github_ui_check', 0)
+
+    if CheckUI == 'true' then
+        local resourcename = GetResourceMetadata(resource, 'name', 0)
+        local repo = GetResourceMetadata(resource, 'github_link', 0)
+
+        local f = LoadResourceFile(resourcename, './ui/index.html')
+        if not f then
+            print("^1 INCORRECT DOWNLOAD!  ^0")
+            print('^4 Please Download: ^2(' .. resourcename .. '.zip) ^4from ^3<' .. repo .. '/releases/latest>^0')
+        end
+    end
+end
+
+-- Check for updates on all resources
+CreateThread(function()
+    local ResourceCount = GetNumResources()
+    for i = 1, ResourceCount - 1, 1 do
+        local resource = GetResourceByFindIndex(i)
+        CheckForUpdate(resource)
+        CheckForUIRelease(resource)
+    end
+end)

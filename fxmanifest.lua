@@ -1,8 +1,11 @@
 game 'rdr3'
 fx_version "adamant"
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
-
 lua54 'yes'
+
+description 'A powerful developer utility for Red'
+author 'BCC Team'
+name 'bcc-utils'
 
 shared_scripts {
     'config.lua',
@@ -13,6 +16,7 @@ shared_scripts {
 }
 
 server_scripts {
+    "@oxmysql/lib/MySQL.lua",
     'server/helpers/*.lua',
     'server/services/*.lua',
     'server/main.lua'
@@ -31,4 +35,8 @@ files {
 
 ui_page 'ui/index.html'
 
-version '1.0.9'
+dependencies {
+    'oxmysql'
+}
+
+version '1.1.0'

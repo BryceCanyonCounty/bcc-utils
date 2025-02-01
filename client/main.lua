@@ -17,7 +17,6 @@ local function getUtils ()
     UtilAPI.Clip = ClipAPI
     UtilAPI.UI = UIAPI
     UtilAPI.Destruct = DestructionAPI
-    UtilAPI.RPC = RPC
     UtilAPI.Button = ButtonAPI
 	
     UtilAPI = SetupSharedAPI(UtilAPI)
@@ -29,6 +28,7 @@ AddEventHandler('bcc:getUtils', function(cb)
     cb(getUtils())
 end)
 
+-- TODO: Create a system wher you can give it an array of exports and it will return them, if non, return all
 exports('initiate',function()
     return getUtils()
 end)

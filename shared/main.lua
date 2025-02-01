@@ -9,5 +9,8 @@ function SetupSharedAPI(SharedApi)
     SharedApi.RPC = RPC
     SharedApi.Command = CommandAPI
     SharedApi.Helpers = HelpersAPI
+    SharedApi.Compression = LibDeflate
+    SharedApi.NetEvents = NetEventsAPI
+
     return SharedApi
 end

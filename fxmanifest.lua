@@ -12,6 +12,8 @@ shared_scripts {
     'shared/data/*.lua',
     'shared/helpers/*.lua',
     'shared/services/compression.lua',
+    'shared/services/sha.lua',
+    'shared/services/crypt.lua',
     'shared/services/*.lua',
     'shared/main.lua'
 }
@@ -40,4 +42,4 @@ dependencies {
     'oxmysql'
 }
 
-version '1.2.0'
+version '1.3.0'

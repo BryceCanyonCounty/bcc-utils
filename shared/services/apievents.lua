@@ -1,3 +1,5 @@
+local netEventIDs = {}
+
 local function compressIt(data)
     return LibDeflate:CompressDeflate(json.encode(data))
 end

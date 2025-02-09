@@ -12,6 +12,8 @@ function SetupSharedAPI(SharedApi)
     SharedApi.Helpers = HelpersAPI
     SharedApi.Compression = LibDeflate
     SharedApi.NetEvents = NetEventsAPI
+    SharedApi.Crypt = CryptAPI
+    SharedApi.UUID = UUID4
 
     return SharedApi
 end

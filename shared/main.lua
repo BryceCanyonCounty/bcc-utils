@@ -7,6 +7,7 @@ function SetupSharedAPI(SharedApi)
     SharedApi.Discord = DiscordAPI
     SharedApi.General = GeneralAPI
     SharedApi.RPC = RPC
+    -- SharedApi.RPC = sRPC -- This is expiremental, don't use it yet
     SharedApi.Command = CommandAPI
     SharedApi.Helpers = HelpersAPI
     SharedApi.Compression = LibDeflate

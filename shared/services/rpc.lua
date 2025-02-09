@@ -19,25 +19,23 @@ end
 -- Helper functions --
 ----------------------
 
-local function compressIt(data)
-    return LibDeflate:CompressDeflate(json.encode(data))
-end
-
-local function decompressIt(data)
-    return json.decode(LibDeflate:DecompressDeflate(data) or '')
-end
-
 -- Helper function to trigger events with JSON-friendly arguments
 local function TriggerRemoteEvent(eventName, targetSource, ...)
     local args = {...}
+    
+    -- Convert tables to JSON for better readability in debugging
     for i, arg in ipairs(args) do
-        args[i] = compressIt(args[i])
+        if type(arg) == "table" then
+            args[i] = json.encode(arg)
+        else
+            args[i] = tostring(arg)
+        end
     end
 
     if IsDuplicityVersion() then
-        TriggerClientEvent(eventName, targetSource or -1, table.unpack(args))
+        TriggerClientEvent(eventName, targetSource or -1, ...)
     else
-        TriggerServerEvent(eventName, table.unpack(args))
+        TriggerServerEvent(eventName, ...)
     end
 end
 
@@ -63,10 +61,6 @@ end
 
 -- Handles incoming procedure calls
 AddEventHandler("BCC:Call", function(id, name, params)
-    id = decompressIt(id)
-    name = decompressIt(name)
-    params = decompressIt(params)
-
     if type(name) ~= "string" then
         return
     end
@@ -81,7 +75,6 @@ AddEventHandler("BCC:Call", function(id, name, params)
         local clientSource = source  -- Capture the source as clientSource
         if not id then return function() end end
         return function(...)
-            print("Triggering response: " .. id)
             TriggerRemoteEvent("BCC:Response", clientSource, id, ...)
         end
     end
@@ -95,18 +88,22 @@ end)
 
 -- Handles incoming procedure responses
 AddEventHandler("BCC:Response", function(id, ...)
-
-    id = decompressIt(id)
     local args = {...}
+
+    -- Convert arguments to JSON if they're tables
     for i, arg in ipairs(args) do
-        args[i] = decompressIt(arg)
+        if type(arg) == "table" then
+            args[i] = json.encode(arg)
+        else
+            args[i] = tostring(arg)
+        end
     end
 
     if not pendingCallbacks[id] then
         return
     end
 
-    pendingCallbacks[id](table.unpack(args))
+    pendingCallbacks[id](...)
     pendingCallbacks[id] = nil
 end)
 
@@ -137,6 +134,7 @@ function RPC:CallAsync(name, params, source)
 
     -- Create a new promise for async handling
     local p = promise.new()
+
     CallRemoteProcedure(name, params, function(...)
         p:resolve({ ... })
     end, source)

@@ -1,8 +1,60 @@
 ButtonAPI = {}
 
+-- virtual key codes: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+local MinVirtualKeyCode <const> = 0x00
+local MaxVirtualKeyCode <const> = 0xFF
+
+---Check if button just pressed
+---@param control integer (doesn't matter for virtual key code) EXAMPLE VALUE: 0
+---@param button string | integer Hash or virtual key code or string to be hashed EXAMPLE VALUE: `INPUT_JUMP` or 0x70 for [F1] button
+---@param checkDisabled boolean Check even if the button is disabled (doesn't matter for virtual key code)
+---@return boolean
+function ButtonAPI:IsKeyPressed(control, button, checkDisabled)
+    if type(button) == "number" and MinVirtualKeyCode < button and button < MaxVirtualKeyCode then
+        ---@diagnostic disable-next-line: undefined-global
+        return IsRawKeyPressed(button)
+    elseif checkDisabled then
+        return IsDisabledControlJustPressed(control, button)
+    else
+        return IsControlJustPressed(control, button)
+    end
+end
+
+---Check if button pressed right now
+---@param control integer (doesn't matter for virtual key code) EXAMPLE VALUE: 0
+---@param button string | integer Hash or virtual key code or string to be hashed EXAMPLE VALUE: `INPUT_JUMP` or 0x70 for [F1] button
+---@param checkDisabled boolean Check even if the button is disabled (doesn't matter for virtual key code)
+---@return boolean
+function ButtonAPI:IsKeyDown(control, button, checkDisabled)
+    if type(button) == "number" and MinVirtualKeyCode < button and button < MaxVirtualKeyCode then
+        ---@diagnostic disable-next-line: undefined-global
+        return IsRawKeyDown(button) -- IsRawKeyUp
+    elseif checkDisabled then
+        return IsDisabledControlPressed(control, button)
+    else
+        return IsControlPressed(control, button)
+    end
+end
+
+---Check if button just released
+---@param control integer (doesn't matter for virtual key code) EXAMPLE VALUE: 0
+---@param button string | integer Hash or virtual key code or string to be hashed EXAMPLE VALUE: `INPUT_JUMP` or 0x70 for [F1] button
+---@param checkDisabled boolean Check even if the button is disabled (doesn't matter for virtual key code)
+---@return boolean
+function ButtonAPI:IsKeyReleased(control, button, checkDisabled)
+    if type(button) == "number" and MinVirtualKeyCode < button and button < MaxVirtualKeyCode then
+        ---@diagnostic disable-next-line: undefined-global
+        return IsRawKeyReleased(button)
+    elseif checkDisabled then
+        return IsDisabledControlJustReleased(control, button)
+    else
+        return IsControlJustReleased(control, button)
+    end
+end
+
 ---Creates a button handler class.
 ---@param control integer EXAMPLE VALUE: 0
----@param button string | integer Hash or string to be hashed EXAMPLE VALUE: `INPUT_JUMP`
+---@param button string | integer Hash or virtual key code or string to be hashed EXAMPLE VALUE: `INPUT_JUMP` or 0x70 for [F1] button
 ---@param checkDisabled boolean Check even if the button is disabled
 ---@param doublePressThreshold integer Treshhold for double and more press detection EXAMPLE VALUE: 300
 ---@param holdPressThreshold integer Treshhold for long press detection EXAMPLE VALUE: 1000
@@ -39,11 +91,7 @@ function ButtonAPI:Create(control, button, checkDisabled, doublePressThreshold, 
     function ButtonClass:Update(alternative)
         local current = GetGameTimer()
 
-        local IsJustPressed =  self.checkDisabled and IsDisabledControlJustPressed  or IsControlJustPressed
-        local IsPressed =      self.checkDisabled and IsDisabledControlPressed      or IsControlPressed
-        local IsJustReleased = self.checkDisabled and IsDisabledControlJustReleased or IsControlJustReleased
-
-        if IsJustPressed(self.control, self.button) then
+        if ButtonAPI:IsKeyPressed(self.control, self.button, self.checkDisabled) then
             if ((current - lastPressTime) < self.repeatedPressThreshold) then
                 pressCount = pressCount + 1 -- Repeated pressing
             else
@@ -51,13 +99,13 @@ function ButtonAPI:Create(control, button, checkDisabled, doublePressThreshold, 
             end
             self.CallbackOnRepeatedJustPressed(pressCount) -- Do something
             lastPressTime = current
-        elseif IsPressed(self.control, self.button) then
+        elseif ButtonAPI:IsKeyDown(self.control, self.button, self.checkDisabled) then
             if ((current - lastPressTime) > self.holdPressThreshold) then
                 self.CallbackOnLongPressDetection(pressCount) -- Do something
                 pressCount = 0 -- needed for omit CallbackOnTotalRepeatedPress (fire only ONE callback among these: CallbackOnLongPressDetection, CallbackOnTotalRepeatedPress)
             end
             self.CallbackOnHold(pressCount) -- Do something
-        elseif IsJustReleased(self.control, self.button) then
+        elseif ButtonAPI:IsKeyReleased(self.control, self.button, self.checkDisabled) then
             if alternative then -- Alternative
                 if ((current - lastReleaseTime) < self.repeatedPressThreshold) then
                     self.CallbackOnRepeatedJustReleased(pressCount) -- Do something
@@ -68,7 +116,7 @@ function ButtonAPI:Create(control, button, checkDisabled, doublePressThreshold, 
                     self.CallbackOnRepeatedJustReleased(pressCount) -- Do something
                 end
             end
-        else
+        else -- IsKeyUp
             if ((current - lastPressTime) > self.repeatedPressThreshold) then
                 if pressCount > 0 then
                     self.CallbackOnTotalRepeatedPress(pressCount) -- Do something
@@ -125,9 +173,14 @@ end
 
 --[[ CODE EXAMPLE:
 
+BccUtils = exports["bcc-utils"].initiate()
+ButtonAPI = BccUtils.Button
+
 local longPressThreshold = 1000
 local repeatPressThreshold = 300
 local button = `INPUT_DUCK` -- same as 0xDB096B85
+-- Look for more button hashes here: https://redlookup.com/controls/?p=1&s=&pp=200&at
+-- Or use virtual key insted from here: https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 local CtrlButton = ButtonAPI:Create(0, button, true, repeatPressThreshold, longPressThreshold, {
     OnRepeatedJustPressed = function(count) end,
     OnRepeatedJustReleased = function(count) end,

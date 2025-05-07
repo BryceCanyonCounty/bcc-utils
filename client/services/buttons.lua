@@ -58,7 +58,7 @@ end
 ---@param checkDisabled boolean Check even if the button is disabled
 ---@param doublePressThreshold integer Treshhold for double and more press detection EXAMPLE VALUE: 300
 ---@param holdPressThreshold integer Treshhold for long press detection EXAMPLE VALUE: 1000
----@param Callbacks { OnRepeatedJustPressed?: function, OnRepeatedJustReleased?: function, OnHold?: function, OnLongPressDetection?: function, OnTotalRepeatedShortPresses ?: function }
+---@param Callbacks { OnRepeatedJustPressed?: function, OnRepeatedJustReleased?: function, OnHold?: function, OnLongPressDetection?: function, OnTotalRepeatedShortPresses?: function, CallbackOnTotalRepeatedPress?: function } # LEGACY support CallbackOnTotalRepeatedPress
 ---@param autoUpdate? boolean automaticaly star update cycle
 ---@param gamepadInput? boolean if true, handles only gamepad input; if false or omitted, handles all inputs by default including keyboard and mouse.
 ---@return ButtonClass
@@ -82,7 +82,7 @@ function ButtonAPI:Create(control, button, checkDisabled, doublePressThreshold, 
     ButtonClass.CallbackOnRepeatedJustReleased =      Callbacks.OnRepeatedJustReleased or function(timesPressed) Debug(string.format("Repeated released number %d", timesPressed)) end
     ButtonClass.CallbackOnHold =                      Callbacks.OnHold or function(timesPressed) --[[Debug(string.format("Hold button"))]] end -- Commented due to spam in the debug console
     ButtonClass.CallbackOnLongPressDetection =        Callbacks.OnLongPressDetection or function(timesPressed) Debug(string.format("Long press after %d press count", timesPressed)) end
-    ButtonClass.CallbackOnTotalRepeatedShortPresses = Callbacks.OnTotalRepeatedShortPresses  or function(timesPressed) Debug(string.format("Total number of short presses %d", timesPressed)) end
+    ButtonClass.CallbackOnTotalRepeatedShortPresses = Callbacks.OnTotalRepeatedShortPresses or Callbacks.CallbackOnTotalRepeatedPress or function(timesPressed) Debug(string.format("Total number of short presses %d", timesPressed)) end
     local lastPressTime = 0
     local pressCount = 0
 

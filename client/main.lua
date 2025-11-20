@@ -18,7 +18,9 @@ local function getUtils ()
     UtilAPI.UI = UIAPI
     UtilAPI.Destruct = DestructionAPI
     UtilAPI.Button = ButtonAPI
-	
+    UtilAPI.Door = DoorAPI
+    UtilAPI.Pickup = PickupAPI
+    UtilAPI.Rayfire = RayfireAPI
     UtilAPI = SetupSharedAPI(UtilAPI)
 
     return UtilAPI

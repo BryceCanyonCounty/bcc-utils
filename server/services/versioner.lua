@@ -2,37 +2,82 @@ VersionerAPI = {}
 ActiveCache = {}
 
 local function _setActiveCache(repo, alerts)
+    if type(ActiveCache) ~= "table" then
+        ActiveCache = {}
+    end
+
     ActiveCache[repo] = {
         alerts = alerts,
         timestamp = os.time()
     }
-    SaveResourceFile(GetCurrentResourceName(), './server/cache/version.json', json.encode(ActiveCache))
+
+    SaveResourceFile(
+        GetCurrentResourceName(),
+        './server/cache/version.json',
+        json.encode(ActiveCache)
+    )
 end
 
 local function _getCachedRelease(repo)
+    if type(ActiveCache) ~= "table" then
+        ActiveCache = {}
+    end
+
     return ActiveCache[repo]
 end
 
 local function _loadActiveCache()
-    ActiveCache = json.decode(LoadResourceFile(GetCurrentResourceName(), './server/cache/version.json'))
+    local data = LoadResourceFile(GetCurrentResourceName(), './server/cache/version.json')
+
+    if data then
+        local ok, decoded = pcall(json.decode, data)
+        if ok and type(decoded) == "table" then
+            ActiveCache = decoded
+        else
+            print("[Versioner] WARNING: Failed to decode cache file, starting with empty cache.")
+            ActiveCache = {}
+        end
+    else
+        print("[Versioner] No cache file found, starting with empty cache.")
+        ActiveCache = {}
+    end
 end
 
 local function _interalCall(resourcename, repo, cached)
     if cached then
+        print(("[Versioner] Using CACHED data for resource '%s' repo '%s'"):format(resourcename, repo))
+
         local cached_release = _getCachedRelease(repo)
+
+        if not cached_release then
+            print(("[Versioner] WARNING: cached_release is nil for repo '%s' (resource '%s')"):format(repo, resourcename))
+            return
+        end
+
+        if not cached_release.alerts then
+            print(("[Versioner] WARNING: cached_release.alerts is nil for repo '%s' (resource '%s')"):format(repo, resourcename))
+            return
+        end
 
         if cached_release.alerts[1] then
             cached_release.alerts[1] = '^6(CACHED)' .. cached_release.alerts[1]
         end
-    
+
         for _, value in ipairs(cached_release.alerts) do
             print(value)
         end
     else
+        print(("[Versioner] Checking LIVE release for resource '%s' repo '%s'"):format(resourcename, repo))
+
         local current = {
-            version = GetResourceMetadata(resourcename, 'version')
+            version = GetResourceMetadata(resourcename, 'version', 0)
         }
         local alerts = {}
+
+        if not current.version or current.version == "" then
+            print(("[Versioner] WARNING: Resource '%s' has no 'version' metadata set."):format(resourcename))
+            return
+        end
 
         PerformHttpRequest('https://api.github.com/repos/' .. repo .. '/releases/latest', function(err, text, headers)
             if err ~= 200 then
@@ -40,16 +85,32 @@ local function _interalCall(resourcename, repo, cached)
                 return
             end
 
+            if not text or text == "" then
+                print(("[Versioner] WARNING: Empty response from GitHub for repo '%s'"):format(repo))
+                return
+            end
 
-            local response = json.decode(text)
+            local ok, response = pcall(json.decode, text)
+            if not ok or type(response) ~= "table" then
+                print(("[Versioner] WARNING: Failed to decode GitHub JSON for repo '%s'"):format(repo))
+                return
+            end
+
             local latest = {
                 url = response.html_url,
                 body = response.body,
                 version = response.tag_name
             }
+
+            if not latest.version then
+                print(("[Versioner] WARNING: No 'tag_name' in latest release for repo '%s'"):format(repo))
+                return
+            end
+
             local uptodate = false
             local overdate = false
 
+            -- NOTE: string comparison; assumes semantic-like versioning and consistent format
             if current.version > latest.version then
                 overdate = true
             elseif current.version < latest.version then
@@ -71,57 +132,81 @@ local function _interalCall(resourcename, repo, cached)
                 alerts = {
                     '^1❌ Outdated! ^5[' .. resourcename .. '] ^6(Version ' .. current.version .. ')^0',
                     '^4NEW VERSION ^2(' .. latest.version .. ') ^3<' .. latest.url .. '>^0',
-                    '^4CHANGELOG ^0\r\n' .. latest.body
+                    '^4CHANGELOG ^0\r\n' .. (latest.body or "")
                 }
             end
+
             _setActiveCache(repo, alerts)
 
             for _, value in ipairs(alerts) do
                 print(value)
             end
-        end, 'GET', json.encode(payload), {
+        end, 'GET', '', {
             ['Content-Type'] = 'application/json'
         })
     end
 end
 
 function VersionerAPI.checkRelease(resourcename, repo)
+    if not repo or repo == "" then
+        print(("[Versioner] WARNING: No github_link metadata for resource '%s'"):format(resourcename))
+        return
+    end
+
     repo = repo:gsub("https://github.com/", "")
 
     local cached_release = _getCachedRelease(repo)
     if cached_release == nil then
         _interalCall(resourcename, repo, false)
     else
-        local hours_from = os.difftime(os.time(), cached_release.timestamp) / (60 * 60) -- seconds in a day
+        local hours_from = os.difftime(os.time(), cached_release.timestamp or 0) / (60 * 60)
         local whole = math.floor(hours_from)
         _interalCall(resourcename, repo, whole < 2) -- 2 hour cache
     end
 end
 
 function VersionerAPI.checkFile(resourcename, repo)
+    if not repo or repo == "" then
+        print(("[Versioner] WARNING: No github_link metadata for resource '%s' (file check)"):format(resourcename))
+        return
+    end
+
     local cleanrepo = repo:gsub("https://github.com/", "")
 
     local current = {
-        version = GetResourceMetadata(resourcename, 'version')
+        version = GetResourceMetadata(resourcename, 'version', 0)
     }
+
+    if not current.version or current.version == "" then
+        print(("[Versioner] WARNING: Resource '%s' has no 'version' metadata set (file check)."):format(resourcename))
+        return
+    end
+
     PerformHttpRequest('https://raw.githubusercontent.com/' .. cleanrepo .. '/main/version',
         function(err, response, headers)
             if err == 404 then
-                print("Version file not found")
+                print("Version file not found for resource: " .. resourcename)
                 return
             end
-            
+
             if response == nil then
                 print("Generic github version error", err)
                 return
             end
 
-            local v = response:match("<%d?%d.%d?%d.?%d?%d?>"):gsub("[<>]", "")
+            local v = response:match("<%d?%d.%d?%d.?%d?%d?>")
+            if not v then
+                print("Failed to parse version in version file for resource: " .. resourcename)
+                return
+            end
+            v = v:gsub("[<>]", "")
+
             local latest = {
                 url = repo,
                 body = response,
                 version = v
             }
+
             local uptodate = false
             local overdate = false
 
@@ -145,11 +230,12 @@ function VersionerAPI.checkFile(resourcename, repo)
                 local cl = latest.body:gsub("<" .. current.version .. ">.*", "")
                 print('^CHANGELOG ^0\r\n' .. cl)
             end
-        end, 'GET', json.encode(payload), {
+        end, 'GET', '', {
             ['Content-Type'] = 'application/json'
         })
 end
 
+-- Load cache on start
 _loadActiveCache()
 
 local function CheckForUpdate(resource)
@@ -159,9 +245,13 @@ local function CheckForUpdate(resource)
         local resourcename = GetResourceMetadata(resource, 'name', 0)
         local github = GetResourceMetadata(resource, 'github_link', 0)
         local githubtype = GetResourceMetadata(resource, 'github_version_type', 0)
-        if not githubtype then
+
+        if not githubtype or githubtype == '' then
             githubtype = "release"
         end
+
+        print(("[Versioner] Checking resource '%s' (internal='%s') github='%s' type='%s'")
+            :format(resourcename, resource, tostring(github), tostring(githubtype)))
 
         if githubtype == "release" then
             VersionerAPI.checkRelease(resourcename, github)
@@ -186,11 +276,20 @@ local function CheckForUIRelease(resource)
     end
 end
 
--- Check for updates on all resources
 CreateThread(function()
     local ResourceCount = GetNumResources()
-    for i = 1, ResourceCount - 1, 1 do
+    local found = {}
+
+    for i = 0, ResourceCount - 1 do
         local resource = GetResourceByFindIndex(i)
+        if resource and resource:match("^bcc%-") then
+            table.insert(found, resource)
+        end
+    end
+
+    table.sort(found)
+
+    for _, resource in ipairs(found) do
         CheckForUpdate(resource)
         CheckForUIRelease(resource)
     end

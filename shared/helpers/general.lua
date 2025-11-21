@@ -22,8 +22,14 @@ function CheckVar(val, def)
         return def
     end
 
+    -- ensure boolean default type matches
+    if type(def) == "boolean" and type(val) ~= "boolean" then
+        return def
+    end
+
     return val
 end
+
 
 HelpersAPI = {
     StringChain = StringChain,

@@ -14,6 +14,7 @@ function SetupSharedAPI(SharedApi)
     SharedApi.NetEvents = NetEventsAPI
     SharedApi.Crypt = CryptAPI
     SharedApi.UUID = UUID4
+    SharedApi.Debug = DebugAPI
 
     return SharedApi
 end

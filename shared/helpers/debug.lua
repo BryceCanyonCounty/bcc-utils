@@ -1,4 +1,3 @@
--- Lightweight debug logger that only prints when DevMode is active.
 DebugAPI = {}
 DebugAPI.__index = DebugAPI
 

@@ -80,7 +80,43 @@ AddEventHandler("BCC:Call", function(id, name, params)
     end
 
     -- Execute the procedure
-    local returnValues = { activeProcedure(params, GetResponseFunction(), source) }
+    -- 🧨 SAFELY CALL PROCEDURE
+    local ok, result1, result2, result3, result4 = pcall(function()
+        return activeProcedure(params, GetResponseFunction(), source)
+    end)
+
+    if not ok then
+        print("^1[ BCC-RPC ERROR ] -------------------------------------^7")
+        print("^1RPC Name:^7      " .. tostring(name))
+        print("^1Error:^7         " .. tostring(result1))
+        print("^1Source:^7        " .. tostring(source))
+
+        -- Params dump
+        if params == nil then
+            print("^1Params:^7       nil")
+        elseif type(params) == "table" then
+            local okJSON, encoded = pcall(json.encode, params)
+            if okJSON then
+                print("^1Params:^7       " .. encoded)
+            else
+                print("^1Params:^7       <FAILED TO ENCODE>")
+            end
+        else
+            print("^1Params:^7       " .. tostring(params))
+        end
+
+        -- Print the callback function details
+        print("^1Procedure fn:^7   " .. tostring(activeProcedure))
+
+        -- Traceback
+        print("^1Traceback:^7")
+        print(debug.traceback(result1, 2))
+
+        print("^1--- END BCC-RPC ERROR ---------------------------------^7")
+        return -- stop further handling
+    end
+
+    local returnValues = { result1, result2, result3, result4 }
     if #returnValues > 0 and id then
         TriggerRemoteEvent("BCC:Response", source, id, table.unpack(returnValues))
     end

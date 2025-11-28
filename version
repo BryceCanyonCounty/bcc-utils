@@ -1,1 +1,11 @@
+<1.4.1>
+- Removed `joinArgs` and now build messages inline
+- Replaced `string.format` with simple concatenation
+- Outputs `[LEVEL] message [prefix]` with color codes
+
 <1.4.0>
+- Added **DoorAPI**, **PickupAPI**, **RayfireAPI**, **VehiclesAPI**
+- Integrated **DebugAPI** (by Apollyon)
+- Updated **ObjectAPI**
+- Enhanced **PromptsAPI**
+- Improved **Versioner** system (stability, debugging, caching)
